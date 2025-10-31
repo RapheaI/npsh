@@ -520,7 +520,7 @@ check_os
 
 check_download_cmd
 
-statistics_of_run-times
+# statistics_of_run-times
 
 # 检查参数
 case "$1" in

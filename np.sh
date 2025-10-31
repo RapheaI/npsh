@@ -1459,7 +1459,7 @@ install() {
   help
 
   # 显示脚本使用情况数据
-  statistics_of_run-times get
+  # statistics_of_run-times get
 }
 
 create_service() {
@@ -1866,7 +1866,7 @@ main() {
   check_cdn
 
   # 统计脚本当天及累计使用次数
-  statistics_of_run-times update np.sh 2>/dev/null
+  # statistics_of_run-times update np.sh 2>/dev/null
 
   # 检查安装状态
   check_install
