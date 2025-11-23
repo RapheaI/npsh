@@ -437,7 +437,7 @@ EOF
   done
 
   # 创建 nodepassdash 目录
-  mkdir -p ~/nodepassdash/logs ~/nodepassdash/public
+  mkdir -p ~/nodepassdash/logs ~/nodepassdash/db
 
   # 检查 nodepassdash 容器是否已存在
   if $CONTAINER_CMD inspect nodepassdash &>/dev/null; then
@@ -458,6 +458,7 @@ EOF
     --restart always \
     -v ~/nodepassdash/logs:/app/logs \
     -v ~/nodepassdash/public:/app/public \
+    -v ~/nodepassdash/db:/app/db \
     -e PORT=$PORT"
 
   # 如果使用自定义证书，添加证书文件挂载和环境变量

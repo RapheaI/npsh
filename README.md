@@ -206,10 +206,10 @@ bash <(curl -sSL https://run.nodepass.eu/dash.sh) install
 
 4. **挂载目录**：
 
-| 主机路径                    | 容器内路径         | 用途   |
-| ----------------------- | ------------- | ---- |
+| 主机路径                 | 容器内路径      | 用途    |
+| ----------------------- | ------------- | ------ |
 | `~/nodepassdash/logs`   | `/app/logs`   | 日志文件 |
-| `~/nodepassdash/public` | `/app/public` | 公共资源 |
+| `~/nodepassdash/db`     | `/app/db    ` | 数据库  |
 
 5. **完成提示**：脚本安装完毕后会输出访问地址和管理员账户信息。
 

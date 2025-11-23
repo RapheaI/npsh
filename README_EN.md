@@ -208,7 +208,7 @@ bash <(curl -sSL https://run.nodepass.eu/dash.sh)
 | Host Path                   | Container Path      | Purpose       |
 |-----------------------------|---------------------|---------------|
 | `~/nodepassdash/logs`       | `/app/logs`         | Log files     |
-| `~/nodepassdash/public`     | `/app/public`       | Public resources |
+| `~/nodepassdash/db`         | `/app/db`           | Database      |
 
 5. **Completion prompt**: The script will output the access address and admin account details upon completion.
 
