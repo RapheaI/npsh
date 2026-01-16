@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # 当前脚本版本号
-SCRIPT_VERSION='0.0.6'
+SCRIPT_VERSION='0.0.7'
 
 
 # 环境变量用于在Debian或Ubuntu操作系统中设置非交互式（noninteractive）安装模式
@@ -20,8 +20,8 @@ mkdir -p $TEMP_DIR
 
 E[0]="\n Language:\n 1. 简体中文 (Default)\n 2. English"
 C[0]="${E[0]}"
-E[1]="1. Supports three versions: stable, development, and classic; 2. Supports switching between the three versions (np -t); 3. Added GitHub proxy"
-C[1]="1. 支持稳定版、开发版和经典版三个版本; 2. 支持三个版本间切换 (np -t); 3. 增加 Github 代理"
+E[1]="Doomsday Protocol"
+C[1]="Doomsday Protocol"
 E[2]="The script must be run as root, you can enter sudo -i and then download and run again. Feedback: [https://github.com/NodePassProject/npsh/issues]"
 C[2]="必须以 root 方式运行脚本，可以输入 sudo -i 后重新下载运行，问题反馈:[https://github.com/NodePassProject/npsh/issues]"
 E[3]="Unsupported architecture: \$(uname -m)"
@@ -1933,7 +1933,6 @@ menu() {
 │    ░░▀░▀░▀▀▀░▀▀▀░▀▀▀░▀░░░▀░▀░▀▀▀░▀▀▀░░    │
 ├───────────────────────────────────────────┤
 │   >Universal TCP/UDP Tunneling Solution   │
-│   >https://github.com/NodePassProject/nodepass   │
 ╰───────────────────────────────────────────╯ "
 
   grep -q '.' <<< "$DEV_LOCAL_VERSION" && grep -q '.' <<< "$STABLE_LOCAL_VERSION" && grep -q '.' <<< "$LTS_LOCAL_VERSION" && info " $(text 45) "
