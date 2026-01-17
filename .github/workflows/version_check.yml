@@ -32,7 +32,7 @@ jobs:
         id: latest_versions
         run: |
           # 获取 Stable 版本 (稳定版使用 latest 标签)
-          STABLE_LATEST_VERSION=$(curl -sL "https://api.github.com/repos/yosebyte/nodepass/releases/latest" | awk -F '"' '/tag_name/{print $4}')
+          STABLE_LATEST_VERSION=$(curl -sL "https://api.github.com/repos/NodePassProject/nodepass/releases/latest" | awk -F '"' '/tag_name/{print $4}')
 
           # 获取 Development 版本 (使用时间判断)
           API_MESSAGE_DEV=$(curl -sL "https://api.github.com/repos/NodePassProject/nodepass-core/releases" | grep -E 'published_at|tag_name')
