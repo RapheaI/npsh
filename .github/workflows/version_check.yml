@@ -54,7 +54,7 @@ jobs:
           fi
 
           # 获取 LTS 版本
-          LTS_LATEST_VERSION=$(curl -sL "https://api.github.com/repos/NodePassProject/nodepass-apt/releases/latest" | awk -F '"' '/tag_name/{print $4}')
+          LTS_LATEST_VERSION=$(curl -sL "https://api.github.com/repos/NodePassProject/nodepass/releases/latest" | awk -F '"' '/tag_name/{print $4}')
 
           echo "STABLE=$STABLE_LATEST_VERSION" >> $GITHUB_OUTPUT
           echo "DEVELOPMENT=$DEV_LATEST_VERSION" >> $GITHUB_OUTPUT
