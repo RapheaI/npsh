@@ -501,9 +501,9 @@ check_port() {
 check_cdn() {
   for PROXY_URL in "${GITHUB_PROXY[@]}"; do
     if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-      REMOTE_VERSION=$(curl -ksL --connect-timeout 3 --max-time 3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README_EN.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development):/\1:/p')
+      REMOTE_VERSION=$(curl -ksL --connect-timeout 3 --max-time 3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development):/\1:/p')
     else
-      REMOTE_VERSION=$(wget -qO- --no-check-certificate --tries=2 --timeout=3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README_EN.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development):/\1:/p')
+      REMOTE_VERSION=$(wget -qO- --no-check-certificate --tries=2 --timeout=3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development):/\1:/p')
     fi
     grep -q 'Stable' <<< "$REMOTE_VERSION" && GH_PROXY="$PROXY_URL" && break
   done
