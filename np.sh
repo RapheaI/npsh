@@ -1535,8 +1535,8 @@ install() {
 
     # 如是需要映射到公网的，则执行 api
     if grep -q '.' <<< "$REMOTE_SERVER_INPUT" && grep -q '.' <<< "$REMOTE_PORT_INPUT"; then
-      # 生成8位随机数字作为alias
-      local CLIENT_ALIAS=$(printf '%08d' $((RANDOM * RANDOM % 100000000)))
+      # 客户端别名，nodepass-dash 在修改实例时如果没有 alias 会报错
+      local CLIENT_ALIAS="api_client"
 
       # 执行 api
       if [ "$DOWNLOAD_TOOL" = "curl" ]; then
@@ -1776,8 +1776,8 @@ change_intranet_penetration_server() {
     grep -q '.' <<< "$REMOTE_PASSWORD_INPUT" && REMOTE_PASSWORD_INPUT+="@"
   fi
 
-  # 生成8位随机数字作为alias
-  local CLIENT_ALIAS=$(printf '%08d' $((RANDOM * RANDOM % 100000000)))
+  # 客户端别名，nodepass-dash 在修改实例时如果没有 alias 会报错
+  local CLIENT_ALIAS="api_client"
 
   # 执行 api
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
