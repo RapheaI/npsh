@@ -2,7 +2,6 @@
 
 SCRIPT_VERSION='0.0.7'
 
-
 export DEBIAN_FRONTEND=noninteractive
 
 GITHUB_PROXY=('https://v6.gh-proxy.org/' 'https://gh-proxy.com/' 'https://hub.glowp.xyz/' 'https://proxy.vvvv.ee/')
