@@ -5,7 +5,6 @@
 
 - Stable: v1.14.3
 - Development: v1.15.0-b1
-- LTS: v1.14.3
 
 ---
 
@@ -56,7 +55,7 @@
 - One-click service start, stop, restart, and uninstall
 - Automatic updates to the latest version
 - Automatic recognition of container environments
-- Supports installation of stable, development, and classic versions (LTS Long Term Support)
+- Supports installation of stable and development versions
 
 ---
 
@@ -125,7 +124,7 @@ bash <(curl -sSL https://run.nodepass.eu/np.sh) \
   --language zh \
   --server_ip 1.2.3.4 \
   --user_port 18080 \
-  --version lts \
+  --version stable \
   --prefix api \
   --tls_mode 2 \
   --cert_file </path/to/cert.pem> \
@@ -146,7 +145,7 @@ After installation, the `np` shortcut command is created:
 | `np -i`   | Install NodePass                     |
 | `np -u`   | Uninstall NodePass                   |
 | `np -v`   | Upgrade NodePass                     |
-| `np -t`   | Switch between stable, dev and lts   |
+| `np -t`   | Switch between stable and dev        |
 | `np -o`   | Start/stop service                   |
 | `np -k`   | Change API key                       |
 | `np -s`   | View API information                 |
@@ -161,7 +160,6 @@ After installation, the `np` shortcut command is created:
 ├── data                # Configuration data
 ├── nodepass            # Main program symlink pointing to the currently used kernel file
 ├── np-dev              # Development version kernel file
-├── np-lts              # Classic version (LTS Long Term Support) kernel file
 ├── np-stb              # Stable version kernel file
 ├── nodepass.gob        # Data storage file
 └── np.sh               # Deployment script

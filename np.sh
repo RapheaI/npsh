@@ -103,9 +103,9 @@ E[43]="NodePass service has been started"
 C[43]="${E[43]}"
 E[44]="Unable to get local version"
 C[44]="${E[44]}"
-E[45]="NodePass Local Core: Stable \$STABLE_LOCAL_VERSION Dev \$DEV_LOCAL_VERSION LTS \$LTS_LOCAL_VERSION"
+E[45]="NodePass Local Core: Stable \$STABLE_LOCAL_VERSION Dev \$DEV_LOCAL_VERSION"
 C[45]="${E[45]}"
-E[46]="NodePass Latest Core: Stable \$STABLE_LATEST_VERSION Dev \$DEV_LATEST_VERSION LTS \$LTS_LATEST_VERSION"
+E[46]="NodePass Latest Core: Stable \$STABLE_LATEST_VERSION Dev \$DEV_LATEST_VERSION"
 C[46]="${E[46]}"
 E[47]="Current version is already the latest, no need to upgrade"
 C[47]="${E[47]}"
@@ -181,7 +181,7 @@ E[82]="Running the service of intranet penetration on the server side:"
 C[82]="${E[82]}"
 E[83]="Failed to retrieve intranet penetration instance. Instance ID: \${INSTANCE\_ID}"
 C[83]="${E[83]}"
-E[84]="Please select the NodePass core to run. Use [np -t] to switch after installation:\\\n 1. Stable \$STABLE_LATEST_VERSION \(NodePassProject/nodepass\) - Suitable for production environments \(default\)\\\n 2. Development \$DEV_LATEST_VERSION \(NodePassProject/nodepass-core\) - Contains latest features, may be unstable\\\n 3. Classic \$LTS_LATEST_VERSION \(NodePassProject/nodepass\) - Long-term support version"
+E[84]="Please select the NodePass core to run. Use [np -t] to switch after installation:\\\n 1. Stable \$STABLE_LATEST_VERSION \(NodePassProject/nodepass\) - Suitable for production environments \(default\)\\\n 2. Development \$DEV_LATEST_VERSION \(NodePassProject/nodepass-core\) - Contains latest features, may be unstable"
 C[84]="${E[84]}"
 E[85]="Getting machine IP address..."
 C[85]="${E[85]}"
@@ -195,13 +195,13 @@ E[89]="NodePass version switch failed"
 C[89]="${E[89]}"
 E[90]="URI:"
 C[90]="${E[90]}"
-E[91]="No upgrade available for both stable, development and classic versions"
+E[91]="No upgrade available for both stable and development versions"
 C[91]="${E[91]}"
 E[92]="Stable version can be upgraded from \$STABLE_LOCAL_VERSION to \$STABLE_LATEST_VERSION"
 C[92]="${E[92]}"
 E[93]="Development version can be upgraded from \$DEV_LOCAL_VERSION to \$DEV_LATEST_VERSION"
 C[93]="${E[93]}"
-E[94]="Stable, development or classic version has available updates"
+E[94]="Stable or development version has available updates"
 C[94]="${E[94]}"
 E[95]="Switch core version"
 C[95]="${E[95]}"
@@ -209,20 +209,14 @@ E[96]="Waiting 5 seconds before starting the service..."
 C[96]="${E[96]}"
 E[97]="Current running version:"
 C[97]="${E[97]}"
-E[98]="Current running version: Classic Version"
+E[98]="Switch to stable version (np-stb)"
 C[98]="${E[98]}"
-E[99]="Classic version can be upgraded from \$LTS_LOCAL_VERSION to \$LTS_LATEST_VERSION"
+E[99]="Switch to development version (np-dev)"
 C[99]="${E[99]}"
-E[100]="Switch to stable version (np-stb)"
+E[100]="Cancel switching"
 C[100]="${E[100]}"
-E[101]="Switch to development version (np-dev)"
+E[101]="Please select the version to switch to (default is 2):"
 C[101]="${E[101]}"
-E[102]="Switch to classic version (np-lts)"
-C[102]="${E[102]}"
-E[103]="Cancel switching"
-C[103]="${E[103]}"
-E[104]="Please select the version to switch to (default is 3):"
-C[104]="${E[104]}"
 
 warning() { echo -e "\033[31m\033[01m$*\033[0m"; }
 error() { echo -e "\033[31m\033[01m$*\033[0m" && exit 1; }
@@ -507,9 +501,9 @@ check_port() {
 check_cdn() {
   for PROXY_URL in "${GITHUB_PROXY[@]}"; do
     if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-      REMOTE_VERSION=$(curl -ksL --connect-timeout 3 --max-time 3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README_EN.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development|LTS):/\1:/p')
+      REMOTE_VERSION=$(curl -ksL --connect-timeout 3 --max-time 3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README_EN.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development):/\1:/p')
     else
-      REMOTE_VERSION=$(wget -qO- --no-check-certificate --tries=2 --timeout=3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README_EN.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development|LTS):/\1:/p')
+      REMOTE_VERSION=$(wget -qO- --no-check-certificate --tries=2 --timeout=3 ${PROXY_URL}https://raw.githubusercontent.com/NodePassProject/npsh/refs/heads/main/README_EN.md 2>/dev/null | sed -nE 's/^-[ ]+(Stable|Development):/\1:/p')
     fi
     grep -q 'Stable' <<< "$REMOTE_VERSION" && GH_PROXY="$PROXY_URL" && break
   done
@@ -653,15 +647,12 @@ get_local_version() {
   if grep -qw 'all' <<< "$1"; then
     DEV_LOCAL_VERSION=$(${WORK_DIR}/np-dev 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*')
     STABLE_LOCAL_VERSION=$(${WORK_DIR}/np-stb 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*')
-    LTS_LOCAL_VERSION=$(${WORK_DIR}/np-lts 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*')
   fi
   local GET_SYMLINK_TARGET=$(readlink ${WORK_DIR}/nodepass 2>/dev/null)
   if grep -q 'np-dev' <<< "$GET_SYMLINK_TARGET"; then
     VERSION_TYPE_TEXT=$(text 66)
   elif grep -q 'np-stb' <<< "$GET_SYMLINK_TARGET"; then
     VERSION_TYPE_TEXT=$(text 67)
-  elif grep -q 'np-lts' <<< "$GET_SYMLINK_TARGET"; then
-    VERSION_TYPE_TEXT=$(text 98)
   fi
   RUNNING_LOCAL_VERSION=$(${WORK_DIR}/nodepass 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*')
 }
@@ -669,13 +660,11 @@ get_local_version() {
 get_latest_version() {
   STABLE_LATEST_VERSION=$(awk -F '[ ]' '/Stable/{print $NF}' <<< "$REMOTE_VERSION")
   DEV_LATEST_VERSION=$(awk -F '[ ]' '/Development/{print $NF}' <<< "$REMOTE_VERSION")
-  LTS_LATEST_VERSION=$(awk -F '[ ]' '/LTS/{print $NF}' <<< "$REMOTE_VERSION")
 
-  [[ -z "$STABLE_LATEST_VERSION" || -z "$DEV_LATEST_VERSION" || -z "$LTS_LATEST_VERSION" ]] && error " $(text 20) "
+  [[ -z "$STABLE_LATEST_VERSION" || -z "$DEV_LATEST_VERSION" ]] && error " $(text 20) "
 
   STABLE_VERSION_NUM=${STABLE_LATEST_VERSION#v}
   DEV_VERSION_NUM=${DEV_LATEST_VERSION#v}
-  LTS_VERSION_NUM=${LTS_LATEST_VERSION#v}
 }
 
 on_off() {
@@ -781,17 +770,8 @@ compatibility_old_binary() {
     fi
   fi
 
-  if [ -d $WORK_DIR ] && ! [ -f "$WORK_DIR/np-lts" ]; then
-    get_latest_version
-
-    if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-      curl -sL "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${LTS_LATEST_VERSION}/nodepass_${LTS_VERSION_NUM}_linux_${ARCH}.tar.gz" | tar -xz -C "$TEMP_DIR"
-    else
-      wget "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${LTS_LATEST_VERSION}/nodepass_${LTS_VERSION_NUM}_linux_${ARCH}.tar.gz" -qO- | tar -xz -C "$TEMP_DIR"
-    fi
-
-    [ -s "$TEMP_DIR/nodepass" ] && mv "$TEMP_DIR/nodepass" "$WORK_DIR/np-lts" && chmod +x "$WORK_DIR/np-lts"
-    get_local_version
+  if [ -d $WORK_DIR ] && [ -f "$WORK_DIR/np-lts" ]; then
+    rm -f "$WORK_DIR/np-lts"
   fi
 }
 
@@ -806,7 +786,6 @@ upgrade_nodepass() {
   local HAS_UPGRADE=0
   local HAS_STABLE_UPGRADE=0
   local HAS_DEV_UPGRADE=0
-  local HAS_LTS_UPGRADE=0
 
   local OPTION_INDEX=1
   local AVAILABLE_INDICES=()
@@ -823,12 +802,6 @@ upgrade_nodepass() {
     HAS_UPGRADE=1
     HAS_DEV_UPGRADE=1
     UPGRADE_INFO+="\n $(text 93) "
-  fi
-
-  if [ -n "$LTS_LOCAL_VERSION" ] && [ -n "$LTS_LATEST_VERSION" ] && [ "$LTS_LOCAL_VERSION" != "$LTS_LATEST_VERSION" ]; then
-    HAS_UPGRADE=1
-    HAS_LTS_UPGRADE=1
-    UPGRADE_INFO+="\n $(text 99) "
   fi
 
   if [ "$HAS_UPGRADE" = 1 ]; then
@@ -851,9 +824,7 @@ upgrade_nodepass() {
     NEED_RESTART=1
   elif [ "$VERSION_TYPE_TEXT" = "$(text 66)" ] && [ "$HAS_DEV_UPGRADE" = 1 ]; then
     NEED_RESTART=1
-  elif [ "$VERSION_TYPE_TEXT" = "$(text 98)" ] && [ "$HAS_LTS_UPGRADE" = 1 ]; then
-    NEED_RESTART=1
-  elif [ "$HAS_STABLE_UPGRADE" = 1 ] && [ "$HAS_DEV_UPGRADE" = 1 ] && [ "$HAS_LTS_UPGRADE" = 1 ]; then
+  elif [ "$HAS_STABLE_UPGRADE" = 1 ] && [ "$HAS_DEV_UPGRADE" = 1 ]; then
     NEED_RESTART=1
   fi
 
@@ -861,7 +832,6 @@ upgrade_nodepass() {
 
   [ "$HAS_STABLE_UPGRADE" = 1 ] && cp "$WORK_DIR/np-stb" "$WORK_DIR/np-stb.old" 2>/dev/null
   [ "$HAS_DEV_UPGRADE" = 1 ] && cp "$WORK_DIR/np-dev" "$WORK_DIR/np-dev.old" 2>/dev/null
-  [ "$HAS_LTS_UPGRADE" = 1 ] && cp "$WORK_DIR/np-lts" "$WORK_DIR/np-lts.old" 2>/dev/null
 
   local DOWNLOAD_SUCCESS=1
 
@@ -881,16 +851,6 @@ upgrade_nodepass() {
       if [ -f "$TEMP_DIR/nodepass-core" ]; then
         mv "$TEMP_DIR/nodepass-core" "$WORK_DIR/np-dev"
         chmod +x "$WORK_DIR/np-dev"
-      else
-        DOWNLOAD_SUCCESS=0
-      fi
-    fi
-
-    if [ "$HAS_LTS_UPGRADE" = 1 ]; then
-      curl -sL "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${LTS_LATEST_VERSION}/nodepass_${LTS_VERSION_NUM}_linux_${ARCH}.tar.gz" | tar -xz -C "$TEMP_DIR"
-      if [ -f "$TEMP_DIR/nodepass" ]; then
-        mv "$TEMP_DIR/nodepass" "$WORK_DIR/np-lts"
-        chmod +x "$WORK_DIR/np-lts"
       else
         DOWNLOAD_SUCCESS=0
       fi
@@ -915,23 +875,12 @@ upgrade_nodepass() {
         DOWNLOAD_SUCCESS=0
       fi
     fi
-
-    if [ "$HAS_LTS_UPGRADE" = 1 ]; then
-      wget "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${LTS_LATEST_VERSION}/nodepass_${LTS_VERSION_NUM}_linux_${ARCH}.tar.gz" -qO- | tar -xz -C "$TEMP_DIR"
-      if [ -f "$TEMP_DIR/nodepass" ]; then
-        mv "$TEMP_DIR/nodepass" "$WORK_DIR/np-lts"
-        chmod +x "$WORK_DIR/np-lts"
-      else
-        DOWNLOAD_SUCCESS=0
-      fi
-    fi
   fi
 
   if [ "$DOWNLOAD_SUCCESS" = 0 ]; then
     warning " $(text 9) "
     [ -s $WORK_DIR/np-stb.old ] && mv "$WORK_DIR/np-stb.old" "$WORK_DIR/np-stb" 2>/dev/null
     [ -s $WORK_DIR/np-dev.old ] && mv "$WORK_DIR/np-dev.old" "$WORK_DIR/np-dev" 2>/dev/null
-    [ -s $WORK_DIR/np-lts.old ] && mv "$WORK_DIR/np-lts.old" "$WORK_DIR/np-lts" 2>/dev/null
 
     [ "$NEED_RESTART" = 1 ] && info " $(text 54) " && start_nodepass
     return 1
@@ -941,12 +890,11 @@ upgrade_nodepass() {
     info " $(text 96) " && sleep 5
     if start_nodepass; then
       info " $(text 52) "
-      rm -f "$WORK_DIR/np-stb.old" "$WORK_DIR/np-dev.old" "$WORK_DIR/np-lts.old"
+      rm -f "$WORK_DIR/np-stb.old" "$WORK_DIR/np-dev.old"
     else
       warning " $(text 53) "
       mv "$WORK_DIR/np-stb.old" "$WORK_DIR/np-stb" 2>/dev/null
       mv "$WORK_DIR/np-dev.old" "$WORK_DIR/np-dev" 2>/dev/null
-      mv "$WORK_DIR/np-lts.old" "$WORK_DIR/np-lts" 2>/dev/null
       if start_nodepass; then
         info " $(text 54) "
       else
@@ -955,12 +903,12 @@ upgrade_nodepass() {
     fi
   else
     info " $(text 52) "
-    rm -f "$WORK_DIR/np-stb.old" "$WORK_DIR/np-dev.old" "$WORK_DIR/np-lts.old"
+    rm -f "$WORK_DIR/np-stb.old" "$WORK_DIR/np-dev.old"
   fi
 }
 
 switch_nodepass_version() {
-  if [ ! -f "$WORK_DIR/np-stb" ] && [ ! -f "$WORK_DIR/np-dev" ] && [ ! -f "$WORK_DIR/np-lts" ]; then
+  if [ ! -f "$WORK_DIR/np-stb" ] && [ ! -f "$WORK_DIR/np-dev" ]; then
     warning " $(text 59) "
     return 1
   fi
@@ -973,12 +921,12 @@ switch_nodepass_version() {
 
   info "\n $(text 97) $VERSION_TYPE_TEXT $RUNNING_LOCAL_VERSION"
 
-  VERSION_TYPE_TEXT_ARRAY=("$(text 67)" "$(text 66)" "$(text 98)")
-  VERSION_NAMES=("stable" "development" "lts")
-  VERSION_FILES=("$WORK_DIR/np-stb" "$WORK_DIR/np-dev" "$WORK_DIR/np-lts")
-  VERSION_TEXTS=("$(text 67)" "$(text 66)" "$(text 98)")
-  VERSION_LOCAL_VERSIONS=("$STABLE_LOCAL_VERSION" "$DEV_LOCAL_VERSION" "$LTS_LOCAL_VERSION")
-  VERSION_DISPLAY_TEXTS=("$(text 100)" "$(text 101)" "$(text 102)")
+  VERSION_TYPE_TEXT_ARRAY=("$(text 67)" "$(text 66)")
+  VERSION_NAMES=("stable" "development")
+  VERSION_FILES=("$WORK_DIR/np-stb" "$WORK_DIR/np-dev")
+  VERSION_TEXTS=("$(text 67)" "$(text 66)")
+  VERSION_LOCAL_VERSIONS=("$STABLE_LOCAL_VERSION" "$DEV_LOCAL_VERSION")
+  VERSION_DISPLAY_TEXTS=("$(text 98)" "$(text 99)")
 
   for i in "${!VERSION_TYPE_TEXT_ARRAY[@]}"; do
     [ "$VERSION_TYPE_TEXT" = "${VERSION_TYPE_TEXT_ARRAY[$i]}" ] && CURRENT_INDEX=$i && break
@@ -995,9 +943,9 @@ switch_nodepass_version() {
     fi
   done
 
-  hint " 3. $(text 103)"
-  reading "\n $(text 104) " SWITCH_CHOICE
-  SWITCH_CHOICE=${SWITCH_CHOICE:-3}
+  hint " 2. $(text 100)"
+  reading "\n $(text 101) " SWITCH_CHOICE
+  SWITCH_CHOICE=${SWITCH_CHOICE:-2}
 
   case "$SWITCH_CHOICE" in
     1)
@@ -1006,14 +954,8 @@ switch_nodepass_version() {
       TARGET_FILE=${VERSION_FILES[$TARGET_INDEX]}
       TARGET_TEXT=${VERSION_TEXTS[$TARGET_INDEX]}
       ;;
-    2)
-      TARGET_INDEX=${AVAILABLE_INDICES[1]}
-      TARGET_VERSION=${VERSION_NAMES[$TARGET_INDEX]}
-      TARGET_FILE=${VERSION_FILES[$TARGET_INDEX]}
-      TARGET_TEXT=${VERSION_TEXTS[$TARGET_INDEX]}
-      ;;
     *)
-      info " $(text 103)"
+      info " $(text 100)"
       return 0
       ;;
   esac
@@ -1113,12 +1055,10 @@ install() {
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
     { curl --connect-timeout 60 --max-time 60 --retry 2 -sL "${GH_PROXY}https://github.com/NodePassProject/nodepass-core/releases/download/${DEV_LATEST_VERSION}/nodepass-core_${DEV_VERSION_NUM}_linux_${ARCH}.tar.gz" | tar -xz -C "$TEMP_DIR"; } &
     { curl --connect-timeout 60 --max-time 60 --retry 2 -sL "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${STABLE_LATEST_VERSION}/nodepass_${STABLE_VERSION_NUM}_linux_${ARCH}.tar.gz" | tar -xz -C "$TEMP_DIR"; } &
-    { curl --connect-timeout 60 --max-time 60 --retry 2 -sL "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${LTS_LATEST_VERSION}/nodepass_${LTS_VERSION_NUM}_linux_${ARCH}.tar.gz" | tar -xz -C "$TEMP_DIR"; } &
     { curl --connect-timeout 60 --max-time 60 --retry 2 -o "$TEMP_DIR/qrencode" "${GH_PROXY}https://github.com/fscarmen/client_template/raw/main/qrencode-go/qrencode-go-linux-$ARCH" >/dev/null 2>&1 && chmod +x "$TEMP_DIR/qrencode" >/dev/null 2>&1; } &
   else
     { wget --timeout=60 --tries=2 "${GH_PROXY}https://github.com/NodePassProject/nodepass-core/releases/download/${DEV_LATEST_VERSION}/nodepass-core_${DEV_VERSION_NUM}_linux_${ARCH}.tar.gz" -qO- | tar -xz -C "$TEMP_DIR"; } &
     { wget --timeout=60 --tries=2 "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${STABLE_LATEST_VERSION}/nodepass_${STABLE_VERSION_NUM}_linux_${ARCH}.tar.gz" -qO- | tar -xz -C "$TEMP_DIR"; } &
-    { wget --timeout=60 --tries=2 "${GH_PROXY}https://github.com/NodePassProject/nodepass/releases/download/${LTS_LATEST_VERSION}/nodepass_${LTS_VERSION_NUM}_linux_${ARCH}.tar.gz" -qO- | tar -xz -C "$TEMP_DIR"; } &
     { wget --no-check-certificate --timeout=60 --tries=2 --continue -qO "$TEMP_DIR/qrencode" "${GH_PROXY}https://github.com/fscarmen/client_template/raw/main/qrencode-go/qrencode-go-linux-$ARCH" >/dev/null 2>&1 && chmod +x "$TEMP_DIR/qrencode" >/dev/null 2>&1; } &
   fi
   rm -f $TEMP_DIR/{README.md,README_zh.md,LICENSE}
@@ -1156,7 +1096,6 @@ install() {
 
   case "$VERSION_TYPE_CHOICE" in
     dev ) VERSION_TYPE_CHOICE="2" ;;
-    lts ) VERSION_TYPE_CHOICE="3" ;;
     stable ) VERSION_TYPE_CHOICE="1" ;;
   esac
 
@@ -1338,13 +1277,11 @@ install() {
 
   mv $TEMP_DIR/nodepass $WORK_DIR/np-stb
   mv $TEMP_DIR/nodepass-core $WORK_DIR/np-dev
-  mv $TEMP_DIR/nodepass $WORK_DIR/np-lts
   mv $TEMP_DIR/qrencode $WORK_DIR/
-  chmod +x $WORK_DIR/{np-stb,np-dev,np-lts,qrencode}
+  chmod +x $WORK_DIR/{np-stb,np-dev,qrencode}
 
   case "$VERSION_TYPE_CHOICE" in
     2) ln -sf "$WORK_DIR/np-dev" "$WORK_DIR/nodepass" ;;
-    3) ln -sf "$WORK_DIR/np-lts" "$WORK_DIR/nodepass" ;;
     *) ln -sf "$WORK_DIR/np-stb" "$WORK_DIR/nodepass" ;;
   esac
 
@@ -1722,8 +1659,8 @@ menu() {
 │   >Universal TCP/UDP Tunneling Solution   │
 ╰───────────────────────────────────────────╯ "
 
-  grep -q '.' <<< "$DEV_LOCAL_VERSION" && grep -q '.' <<< "$STABLE_LOCAL_VERSION" && grep -q '.' <<< "$LTS_LOCAL_VERSION" && info " $(text 45) "
-  grep -q '.' <<< "$DEV_LATEST_VERSION" && grep -q '.' <<< "$STABLE_LATEST_VERSION" && grep -q '.' <<< "$LTS_LATEST_VERSION" && info " $(text 46) "
+  grep -q '.' <<< "$DEV_LOCAL_VERSION" && grep -q '.' <<< "$STABLE_LOCAL_VERSION" && info " $(text 45) "
+  grep -q '.' <<< "$DEV_LATEST_VERSION" && grep -q '.' <<< "$STABLE_LATEST_VERSION" && info " $(text 46) "
   grep -q '.' <<< "$RUNNING_LOCAL_VERSION" && info " $VERSION_TYPE_TEXT $RUNNING_LOCAL_VERSION"
   grep -qEw '0|1' <<< "$INSTALL_STATUS" && info " $(text 60) $NODEPASS_STATUS "
   grep -q '.' <<< "$API_URL" && info " $(text 39) $API_URL"

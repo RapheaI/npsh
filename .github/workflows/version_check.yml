@@ -20,7 +20,7 @@ jobs:
       - name: Get current versions from README
         id: current_versions
         run: |
-          current_versions=$(sed -nE 's/^-[ ]+(Stable|Development|LTS):/\1:/p' README.md)
+          current_versions=$(sed -nE 's/^-[ ]+(Stable|Development):/\1:/p' README.md)
           versions=$(echo $current_versions | tr '\n' ' ')
           echo "versions=$versions" >> $GITHUB_OUTPUT
           echo "Current versions:"
@@ -46,15 +46,11 @@ jobs:
             DEV_LATEST_VERSION=""
           fi
 
-          LTS_LATEST_VERSION=$(curl -sL "https://api.github.com/repos/NodePassProject/nodepass/releases/latest" | awk -F '"' '/tag_name/{print $4}')
-
           echo "STABLE=$STABLE_LATEST_VERSION" >> $GITHUB_OUTPUT
           echo "DEVELOPMENT=$DEV_LATEST_VERSION" >> $GITHUB_OUTPUT
-          echo "LTS=$LTS_LATEST_VERSION" >> $GITHUB_OUTPUT
 
           echo "Latest Stable: $STABLE_LATEST_VERSION"
           echo "Latest Development: $DEV_LATEST_VERSION"
-          echo "Latest LTS: $LTS_LATEST_VERSION"
 
       - name: Compare versions and update README if needed
         id: compare
@@ -63,23 +59,19 @@ jobs:
 
           CURRENT_STABLE=${version_arr[0]}
           CURRENT_DEVELOPMENT=${version_arr[1]}
-          CURRENT_LTS=${version_arr[2]}
 
           LATEST_STABLE="${{ steps.latest_versions.outputs.STABLE }}"
           LATEST_DEVELOPMENT="${{ steps.latest_versions.outputs.DEVELOPMENT }}"
-          LATEST_LTS="${{ steps.latest_versions.outputs.LTS }}"
 
           echo "Current Stable: ${CURRENT_STABLE:-None}, Latest: $LATEST_STABLE"
           echo "Current Development: ${CURRENT_DEVELOPMENT:-None}, Latest: $LATEST_DEVELOPMENT"
-          echo "Current LTS: ${CURRENT_LTS:-None}, Latest: $LATEST_LTS"
 
-          if [[ "${CURRENT_STABLE:-}" != "$LATEST_STABLE" ]] || [[ "${CURRENT_DEVELOPMENT:-}" != "$LATEST_DEVELOPMENT" ]] || [[ "${CURRENT_LTS:-}" != "$LATEST_LTS" ]]; then
+          if [[ "${CURRENT_STABLE:-}" != "$LATEST_STABLE" ]] || [[ "${CURRENT_DEVELOPMENT:-}" != "$LATEST_DEVELOPMENT" ]]; then
             echo "New version detected. Updating README..."
             echo "needs_update=true" >> $GITHUB_OUTPUT
 
             sed -i "s/- Stable: .*/- Stable: $LATEST_STABLE/" README.md
             sed -i "s/- Development: .*/- Development: $LATEST_DEVELOPMENT/" README.md
-            sed -i "s/- LTS: .*/- LTS: $LATEST_LTS/" README.md
 
             commit_parts=()
 
@@ -91,10 +83,6 @@ jobs:
               commit_parts+=("Development to $LATEST_DEVELOPMENT")
             fi
 
-            if [[ "${CURRENT_LTS:-}" != "$LATEST_LTS" ]]; then
-              commit_parts+=("LTS to $LATEST_LTS")
-            fi
-
             commit_msg=""
             case ${#commit_parts[@]} in
               1)
@@ -103,9 +91,6 @@ jobs:
               2)
                 commit_msg="Update ${commit_parts[0]} and ${commit_parts[1]}"
                 ;;
-              3)
-                commit_msg="Update ${commit_parts[0]}, ${commit_parts[1]} and ${commit_parts[2]}"
-                ;;
             esac
 
             echo "commit_msg=$commit_msg" >> $GITHUB_OUTPUT
@@ -113,7 +98,6 @@ jobs:
             echo "README updated with new versions:"
             echo "  Stable: $LATEST_STABLE"
             echo "  Development: $LATEST_DEVELOPMENT"
-            echo "  LTS: $LATEST_LTS"
           else
             echo "No version updates needed."
             echo "needs_update=false" >> $GITHUB_OUTPUT
