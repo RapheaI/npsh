@@ -1299,10 +1299,10 @@ install() {
     info "\n $(text 10) "
 
     if grep -q '.' <<< "$REMOTE_SERVER_INPUT" && grep -q '.' <<< "$REMOTE_PORT_INPUT"; then
-      # 客户端别名，nodepass-dash 在修改实例时如果没有 alias 会报错
+      # Client alias, nodepass-dash requires alias when modifying instances
       local CLIENT_ALIAS="api_client"
 
-      # 执行 api
+      # Execute API request
       if [ "$DOWNLOAD_TOOL" = "curl" ]; then
         local CREATE_NEW_INSTANCE_ID=$(curl -ksS -X 'POST' \
           "${HTTP_S}://127.0.0.1:${PORT}/${PREFIX}/v1/instances" \
@@ -1526,10 +1526,10 @@ change_intranet_penetration_server() {
     grep -q '.' <<< "$REMOTE_PASSWORD_INPUT" && REMOTE_PASSWORD_INPUT+="@"
   fi
 
-  # 客户端别名，nodepass-dash 在修改实例时如果没有 alias 会报错
+  # Client alias, nodepass-dash requires alias when modifying instances
   local CLIENT_ALIAS="api_client"
 
-  # 执行 api
+  # Execute API request
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
     curl -ksS -X 'PUT' \
       "${HTTP_S}://127.0.0.1:${PORT}/${PREFIX}/v1/instances/${INSTANCE_ID}" \
