@@ -1299,6 +1299,10 @@ install() {
     info "\n $(text 10) "
 
     if grep -q '.' <<< "$REMOTE_SERVER_INPUT" && grep -q '.' <<< "$REMOTE_PORT_INPUT"; then
+      # Client alias, nodepass-dash requires alias when modifying instances
+      local CLIENT_ALIAS="api_client"
+
+      # Execute API request
       if [ "$DOWNLOAD_TOOL" = "curl" ]; then
         local CREATE_NEW_INSTANCE_ID=$(curl -ksS -X 'POST' \
           "${HTTP_S}://127.0.0.1:${PORT}/${PREFIX}/v1/instances" \
@@ -1306,7 +1310,8 @@ install() {
           -H "X-API-Key: ${KEY}" \
           -H 'Content-Type: application/json' \
           -d "{
-            \"url\": \"client://${REMOTE_PASSWORD_INPUT}${URL_SERVER_IP}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}\"
+            \"url\": \"client://${REMOTE_PASSWORD_INPUT}${URL_SERVER_IP}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}?min=4\",
+            \"alias\": \"${CLIENT_ALIAS}\"
           }" 2>&1 | sed 's/{"id":"\([0-9a-f]\{8\}\)".*/\1/')
 
         grep -q "^[0-9a-f]\{8\}$" <<< "${CREATE_NEW_INSTANCE_ID}" && curl -X 'PATCH' "http://127.0.0.1:${PORT}/${PREFIX}/v1/instances/${CREATE_NEW_INSTANCE_ID}" \
@@ -1317,7 +1322,7 @@ install() {
           --header="accept: application/json" \
           --header="X-API-Key: ${KEY}" \
           --header="Content-Type: application/json" \
-          --body-data="{\"url\": \"client://${REMOTE_PASSWORD_INPUT}${URL_SERVER_IP}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}\"}" \
+          --body-data="{\"url\": \"client://${REMOTE_PASSWORD_INPUT}${URL_SERVER_IP}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}?min=4\", \"alias\": \"${CLIENT_ALIAS}\"}" \
           "${HTTP_S}://127.0.0.1:${PORT}/${PREFIX}/v1/instances" 2>&1 | sed 's/{"id":"\([0-9a-f]\{8\}\)".*/\1/')
 
         grep -q "^[0-9a-f]\{8\}$" <<< "${CREATE_NEW_INSTANCE_ID}" && wget --no-check-certificate --method=PATCH \
@@ -1521,6 +1526,10 @@ change_intranet_penetration_server() {
     grep -q '.' <<< "$REMOTE_PASSWORD_INPUT" && REMOTE_PASSWORD_INPUT+="@"
   fi
 
+  # Client alias, nodepass-dash requires alias when modifying instances
+  local CLIENT_ALIAS="api_client"
+
+  # Execute API request
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
     curl -ksS -X 'PUT' \
       "${HTTP_S}://127.0.0.1:${PORT}/${PREFIX}/v1/instances/${INSTANCE_ID}" \
@@ -1528,14 +1537,15 @@ change_intranet_penetration_server() {
       -H "X-API-Key: ${KEY}" \
       -H 'Content-Type: application/json' \
       -d "{
-        \"url\": \"client://${REMOTE_PASSWORD_INPUT}${REMOTE_SERVER_INPUT}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}\"
+        \"url\": \"client://${REMOTE_PASSWORD_INPUT}${REMOTE_SERVER_INPUT}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}?min=4\",
+        \"alias\": \"${CLIENT_ALIAS}\"
       }" &>/dev/null
   else
     wget --no-check-certificate -qO- --method=PUT \
       --header="accept: application/json" \
       --header="X-API-Key: ${KEY}" \
       --header="Content-Type: application/json" \
-      --body-data="{\"url\": \"client://${REMOTE_PASSWORD_INPUT}${REMOTE_SERVER_INPUT}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}\"}" \
+      --body-data="{\"url\": \"client://${REMOTE_PASSWORD_INPUT}${REMOTE_SERVER_INPUT}:${TUNNEL_PORT_INPUT}/127.0.0.1:${PORT}?min=4\", \"alias\": \"${CLIENT_ALIAS}\"}" \
       "${HTTP_S}://127.0.0.1:${PORT}/${PREFIX}/v1/instances/${INSTANCE_ID}" &>/dev/null
   fi
 
