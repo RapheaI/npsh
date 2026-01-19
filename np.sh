@@ -1405,7 +1405,7 @@ EOF
 
   elif [ "$SERVICE_MANAGE" = "init.d" ]; then
     cat > /etc/init.d/nodepass << EOF
-#!/sbin/openrc-run
+#!/bin/sh /etc/rc.common
 
 START=99
 STOP=10
@@ -1468,6 +1468,7 @@ create_shortcut() {
   fi
 
   cat > ${WORK_DIR}/np.sh << EOF
+#!/usr/bin/env bash
 
 bash <($DOWNLOAD_COMMAND https://run.nodepass.eu/np.sh) \$1
 EOF
