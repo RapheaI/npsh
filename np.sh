@@ -1382,6 +1382,7 @@ EOF
 
   elif [ "$SERVICE_MANAGE" = "rc-service" ]; then
     cat > /etc/init.d/nodepass << EOF
+#!/sbin/openrc-run
 
 name="nodepass"
 description="NodePass Service"
@@ -1404,6 +1405,7 @@ EOF
 
   elif [ "$SERVICE_MANAGE" = "init.d" ]; then
     cat > /etc/init.d/nodepass << EOF
+#!/sbin/openrc-run
 
 START=99
 STOP=10
