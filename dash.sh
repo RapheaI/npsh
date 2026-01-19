@@ -272,7 +272,8 @@ install_nodepassdash() {
   fi
 
   while true; do
-    read -p "$(echo -e ${YELLOW}Please enter domain name or IPv4/IPv6 address (required): ${NC})" INPUT
+    prompt=$(echo -e "${YELLOW}Please enter domain name or IPv4/IPv6 address (required): ${NC}")
+    read -p "$prompt" INPUT
     if validate_input "$INPUT"; then
       echo -e "${GREEN}Your input is: $INPUT${NC}"
       break
@@ -284,12 +285,14 @@ install_nodepassdash() {
   if ! [[ "$INPUT" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && ! [[ "$INPUT" =~ ^[0-9a-fA-F:]+$ ]]; then
     echo -e "${YELLOW}Please choose TLS certificate mode (default 1):${NC}"
     echo -e "${GREEN} 1. Use Caddy to automatically apply for certificate (default)\n 2. Custom TLS certificate file path${NC}"
-    read -p "$(echo -e ${YELLOW}Please choose: ${NC})" TLS_MODE
+    prompt=$(echo -e "${YELLOW}Please choose: ${NC}")
+    read -p "$prompt" TLS_MODE
     TLS_MODE=${TLS_MODE:-1}
 
     if [ "$TLS_MODE" = "2" ]; then
       while true; do
-        read -p "$(echo -e ${YELLOW}Please enter your TLS certificate file path:${NC}) " CERT_FILE
+        prompt=$(echo -e "${YELLOW}Please enter your TLS certificate file path:${NC} ")
+        read -p "$prompt" CERT_FILE
         if [ -f "$CERT_FILE" ]; then
           break
         else
@@ -298,7 +301,8 @@ install_nodepassdash() {
       done
 
       while true; do
-        read -p "$(echo -e ${YELLOW}Please enter your TLS private key file path:${NC}) " KEY_FILE
+        prompt=$(echo -e "${YELLOW}Please enter your TLS private key file path:${NC} ")
+        read -p "$prompt" KEY_FILE
         if [ -f "$KEY_FILE" ]; then
           break
         else
@@ -348,7 +352,8 @@ EOF
   fi
 
   while true; do
-    read -p "$(echo -e ${YELLOW}Please enter the port to use (default 3000): ${NC})" PORT
+    prompt=$(echo -e "${YELLOW}Please enter the port to use (default 3000): ${NC}")
+    read -p "$prompt" PORT
     PORT=${PORT:-3000}
 
 
