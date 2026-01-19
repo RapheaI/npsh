@@ -51,7 +51,7 @@ E[17]="Please enter the correct option"
 C[17]="${E[17]}"
 E[18]="NodePass is already installed, please uninstall it before reinstalling"
 C[18]="${E[18]}"
-E[19]="NodePass \$LATEST\_VERSION and QRencode have been downloaded."
+E[19]="NodePass Stable \$STABLE_LATEST_VERSION, Development \$DEV_LATEST_VERSION and QRencode have been downloaded."
 C[19]="${E[19]}"
 E[20]="Failed to get latest version"
 C[20]="${E[20]}"
@@ -645,8 +645,8 @@ get_random_port() {
 
 get_local_version() {
   if grep -qw 'all' <<< "$1"; then
-    DEV_LOCAL_VERSION=$(${WORK_DIR}/np-dev 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*')
-    STABLE_LOCAL_VERSION=$(${WORK_DIR}/np-stb 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*')
+    [ -f "$WORK_DIR/np-dev" ] && DEV_LOCAL_VERSION=$(${WORK_DIR}/np-dev 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*') || DEV_LOCAL_VERSION=""
+    [ -f "$WORK_DIR/np-stb" ] && STABLE_LOCAL_VERSION=$(${WORK_DIR}/np-stb 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+[^[:space:]]*') || STABLE_LOCAL_VERSION=""
   fi
   local GET_SYMLINK_TARGET=$(readlink ${WORK_DIR}/nodepass 2>/dev/null)
   if grep -q 'np-dev' <<< "$GET_SYMLINK_TARGET"; then
@@ -792,13 +792,13 @@ upgrade_nodepass() {
 
   local UPGRADE_INFO=""
 
-  if [ -n "$STABLE_LOCAL_VERSION" ] && [ -n "$STABLE_LATEST_VERSION" ] && [ "$STABLE_LOCAL_VERSION" != "$STABLE_LATEST_VERSION" ]; then
+  if [ -f "$WORK_DIR/np-stb" ] && [ -n "$STABLE_LATEST_VERSION" ] && [ "$STABLE_LOCAL_VERSION" != "$STABLE_LATEST_VERSION" ]; then
     HAS_UPGRADE=1
     HAS_STABLE_UPGRADE=1
     UPGRADE_INFO+="\n $(text 92) "
   fi
 
-  if [ -n "$DEV_LOCAL_VERSION" ] && [ -n "$DEV_LATEST_VERSION" ] && [ "$DEV_LOCAL_VERSION" != "$DEV_LATEST_VERSION" ]; then
+  if [ -f "$WORK_DIR/np-dev" ] && [ -n "$DEV_LATEST_VERSION" ] && [ "$DEV_LOCAL_VERSION" != "$DEV_LATEST_VERSION" ]; then
     HAS_UPGRADE=1
     HAS_DEV_UPGRADE=1
     UPGRADE_INFO+="\n $(text 93) "
@@ -1672,9 +1672,15 @@ menu() {
 │   >Universal TCP/UDP Tunneling Solution   │
 ╰───────────────────────────────────────────╯ "
 
-  grep -q '.' <<< "$DEV_LOCAL_VERSION" && grep -q '.' <<< "$STABLE_LOCAL_VERSION" && info " $(text 45) "
-  grep -q '.' <<< "$DEV_LATEST_VERSION" && grep -q '.' <<< "$STABLE_LATEST_VERSION" && info " $(text 46) "
-  grep -q '.' <<< "$RUNNING_LOCAL_VERSION" && info " $VERSION_TYPE_TEXT $RUNNING_LOCAL_VERSION"
+  if [ -n "$STABLE_LOCAL_VERSION" ] || [ -n "$DEV_LOCAL_VERSION" ]; then
+    info " $(text 45) "
+  fi
+  if [ -n "$STABLE_LATEST_VERSION" ] || [ -n "$DEV_LATEST_VERSION" ]; then
+    info " $(text 46) "
+  fi
+  if [ -n "$RUNNING_LOCAL_VERSION" ]; then
+    info " $VERSION_TYPE_TEXT $RUNNING_LOCAL_VERSION"
+  fi
   grep -qEw '0|1' <<< "$INSTALL_STATUS" && info " $(text 60) $NODEPASS_STATUS "
   grep -q '.' <<< "$API_URL" && info " $(text 39) $API_URL"
   grep -q '.' <<< "$KEY" && info " $(text 40) $KEY"
